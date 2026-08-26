@@ -569,31 +569,120 @@
   </transform>
   <transform>
     <type>NumberRange</type>
-    <name>Number range</name>
-    <inputField/>
-    <outputField>range</outputField>
+    <name>Faixa de Temperatura</name>
+    <inputField>temperatura_normalizada</inputField>
+    <outputField>faixa_temperatura</outputField>
     <fallBackValue>unknown</fallBackValue>
     <rules>
       <rule>
-        <lower_bound/>
-        <upper_bound>5</upper_bound>
-        <value>Less than 5</value>
+        <lower_bound>-100</lower_bound>
+        <upper_bound>0.35</upper_bound>
+        <value>Frio</value>
       </rule>
       <rule>
-        <lower_bound>5</lower_bound>
-        <upper_bound>10</upper_bound>
-        <value>5-10</value>
+        <lower_bound>0.35</lower_bound>
+        <upper_bound>0.65</upper_bound>
+        <value>Ameno</value>
       </rule>
       <rule>
-        <lower_bound>10</lower_bound>
-        <upper_bound/>
-        <value>More than 10</value>
+        <lower_bound>0.65</lower_bound>
+        <upper_bound>100</upper_bound>
+        <value>Quente</value>
       </rule>
     </rules>
     <distribute>Y</distribute>
     <copies>1</copies>
     <GUI>
       <xloc>896</xloc>
+      <yloc>96</yloc>
+    </GUI>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <attributes/>
+  </transform>
+  <transform>
+    <type>InsertUpdate</type>
+    <name>Carga_postgres</name>
+    <lookup>
+      <key>
+        <name>data_registro</name>
+        <field>data_registro</field>
+        <condition>=</condition>
+        <name2/>
+      </key>
+      <key>
+        <name>hora</name>
+        <field>hora</field>
+        <condition>=</condition>
+        <name2/>
+      </key>
+      <value>
+        <name>data_registro</name>
+        <rename>data_registro</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>id_estacao</name>
+        <rename>id_estacao</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>id_clima</name>
+        <rename>id_clima</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>temperatura_normalizada</name>
+        <rename>temperatura_normalizada</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>usuarios_casuais</name>
+        <rename>usuarios_casuais</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>usuarios_registrados</name>
+        <rename>usuarios_registrados</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>total_locacoes</name>
+        <rename>total_locacoes</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>hora</name>
+        <rename>hora</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>estacao_desc</name>
+        <rename>estacao_desc</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>clima_desc</name>
+        <rename>clima_desc</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>faixa_temperatura</name>
+        <rename>faixa_temperatura</rename>
+        <update>Y</update>
+      </value>
+      <schema>public</schema>
+      <table>tb_fact_bike_sharing</table>
+    </lookup>
+    <commit>100</commit>
+    <update_bypassed>N</update_bypassed>
+    <connection>postgres_docker</connection>
+    <distribute>Y</distribute>
+    <copies>1</copies>
+    <GUI>
+      <xloc>1088</xloc>
       <yloc>96</yloc>
     </GUI>
     <partitioning>
@@ -625,7 +714,12 @@
     </hop>
     <hop>
       <from>Mapear Clima</from>
-      <to>Number range</to>
+      <to>Faixa de Temperatura</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Faixa de Temperatura</from>
+      <to>Carga_postgres</to>
       <enabled>Y</enabled>
     </hop>
   </order>
